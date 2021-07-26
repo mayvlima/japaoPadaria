@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,20 +60,17 @@ public class CompraController {
     }
 
    @PostMapping()
-    public ResponseEntity<Compra> createCompra(@RequestParam Long id_fornecedor, @RequestBody Compra compra) {
+    public ResponseEntity<Compra> createCompra(@RequestBody Fornecedor fornecedor) {
         try {
-            Optional<Fornecedor> fornecedor = fornecedorRepository.findById(id_fornecedor);
+            Optional<Fornecedor> fornecedorCompra = fornecedorRepository.findById(fornecedor.getId());
 
-            if (fornecedor.isPresent()) {
 
+            if (fornecedorCompra.isPresent()) {
                 Compra novaCompra = new Compra();
+                novaCompra.setDataDaCompra(new Timestamp(System.currentTimeMillis()));
+                novaCompra.setFornecedor(fornecedorCompra.get());
 
-                novaCompra.setFornecedor(fornecedor.get());
-
-                compraRepository.save(novaCompra);
-
-                return new ResponseEntity<>(novaCompra, HttpStatus.CREATED);
-
+                return new ResponseEntity<>(compraRepository.save(novaCompra), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
