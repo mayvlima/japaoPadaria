@@ -10,7 +10,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -22,7 +24,7 @@ public class Compra {
     private Long id;
 
     @Column(name = "data_da_compra")
-    private Timestamp dataDaCompra;
+    private LocalDateTime dataDaCompra;
 
     @Column(name = "valor_total")
     private BigDecimal valorTotal;
@@ -32,12 +34,7 @@ public class Compra {
     private Fornecedor fornecedor;
 
     public Compra(){
-    }
 
-    public Compra(Timestamp dataDaCompra, Fornecedor fornecedor) {
-        this.dataDaCompra = new Timestamp(System.currentTimeMillis());;
-        this.valorTotal = null;
-        this.fornecedor = fornecedor;
     }
 
     public Long getId() {
@@ -48,11 +45,11 @@ public class Compra {
         this.id = id;
     }
 
-    public Timestamp getDataDaCompra() {
+    public LocalDateTime getDataDaCompra() {
         return dataDaCompra;
     }
 
-    public void setDataDaCompra(Timestamp dataDaCompra) {
+    public void setDataDaCompra(LocalDateTime dataDaCompra) {
         this.dataDaCompra = dataDaCompra;
     }
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,8 +67,9 @@ public class CompraController {
 
 
             if (fornecedorCompra.isPresent()) {
+
                 Compra novaCompra = new Compra();
-                novaCompra.setDataDaCompra(new Timestamp(System.currentTimeMillis()));
+                novaCompra.setDataDaCompra(LocalDateTime.now());
                 novaCompra.setFornecedor(fornecedorCompra.get());
 
                 return new ResponseEntity<>(compraRepository.save(novaCompra), HttpStatus.CREATED);
