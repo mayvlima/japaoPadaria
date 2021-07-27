@@ -60,13 +60,27 @@ public class ItensCompraController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItensCompra> getItensCompraById(@PathVariable("id") long id) {
-        Optional<ItensCompra> itensCompra = itensCompraRepository.findById(id);
+    public ResponseEntity<List<ItensCompra>> getItensCompraByIdCompra(@PathVariable("id") long id) {
 
-        if (itensCompra.isPresent()) {
-            return new ResponseEntity<>(itensCompra.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Optional<Compra> compra = compraRepository.findById(id);
+
+            if (compra.isPresent()) {
+                List<ItensCompra> itensCompras = new ArrayList<>();
+
+                itensCompraRepository.findAllByCompra(compra.get()).forEach(itensCompras::add);
+
+                if (itensCompras.isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                }
+
+                return new ResponseEntity<>(itensCompras, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
