@@ -1,5 +1,6 @@
 package com.techbank.japaoPadaria.model;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,12 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
+
 @Entity
 @Table(name = "produto")
 public class Produto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -37,7 +39,7 @@ public class Produto {
     @Column(nullable = false)
     private boolean status;
 
-    public Produto(){
+    public Produto() {
 
     }
 
@@ -107,13 +109,14 @@ public class Produto {
         this.unidadeDeMedida = unidadeDeMedida;
     }
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 
     public void setStatus(boolean status) {
         this.status = status;
     }
+
 
     @Override
     public String toString() {
