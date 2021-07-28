@@ -32,7 +32,7 @@ public class ItensProducao {
     private Producao producao;
 
     @ManyToOne
-    @JoinColumn(name = "id_produto_utilizado")
+    @JoinColumn(name = "id_produto")
     @JsonIgnore
     private Produto produto;
 
