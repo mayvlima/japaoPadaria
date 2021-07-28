@@ -6,8 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Entity
@@ -38,6 +40,13 @@ public class Produto {
 
     @Column(nullable = false)
     private boolean status;
+
+    @OneToMany(mappedBy = "produto")
+    private List<ItensProducao> itensProducao;
+
+    @OneToMany(mappedBy = "produto")
+    private List<Producao> producoes;
+
 
     public Produto() {
 

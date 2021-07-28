@@ -1,5 +1,6 @@
 package com.techbank.japaoPadaria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -27,12 +28,12 @@ public class ItensProducao {
 
     @ManyToOne
     @JoinColumn(name = "id_producao")
-    @JsonIgnoreProperties("itensProducao")
+    @JsonIgnore
     private Producao producao;
 
     @ManyToOne
     @JoinColumn(name = "id_produto_utilizado")
-    @JsonIgnoreProperties("itensProducao")
+    @JsonIgnore
     private Produto produto;
 
     public Long getId() {

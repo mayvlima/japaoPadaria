@@ -25,7 +25,7 @@ public class ProdutoController {
     @Autowired
     ProdutoRepository produtoRepository;
 
-    @GetMapping("/listarTodos")
+    @GetMapping
     public ResponseEntity<List<Produto>> getAllProdutos() {
         try {
 
@@ -100,7 +100,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Produto> getProdutoById(@PathVariable("id") long id) {
         Optional<Produto> produto = produtoRepository.findById(id);
 
@@ -111,7 +111,7 @@ public class ProdutoController {
         }
     }
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         try {
             Produto novoProduto = produtoRepository.save(produto);
@@ -121,7 +121,7 @@ public class ProdutoController {
         }
     }
 
-    @PutMapping("/atualizar/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Produto> updateProduto(@PathVariable("id") long id, @RequestBody Produto produto) {
         Optional<Produto> produtoDesejado = produtoRepository.findById(id);
 

@@ -49,7 +49,7 @@ public class CompraController {
     @Autowired
     EstoqueRepository estoqueRepository;
 
-    @GetMapping("/listarTodos")
+    @GetMapping
     public ResponseEntity<List<Compra>> getAllCompras() {
         try {
 
@@ -67,7 +67,7 @@ public class CompraController {
         }
     }
 
-    @GetMapping("buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Compra> getCompraById(@PathVariable("id") long id) {
         Optional<Compra> compra = compraRepository.findById(id);
 
@@ -78,7 +78,7 @@ public class CompraController {
         }
     }
 
-   @PostMapping("/criar")
+   @PostMapping
     public ResponseEntity<Compra> createCompra(@RequestBody Fornecedor fornecedor) {
         try {
             Optional<Fornecedor> fornecedorCompra = fornecedorRepository.findById(fornecedor.getId());
@@ -101,7 +101,7 @@ public class CompraController {
         }
     }
 
-    @PostMapping("adicionarProduto/{id}")
+    @PostMapping("/adicionarProduto/{id}")
     public ResponseEntity<ItensCompra> createItensCompra(@PathVariable("id") long id, @RequestBody ItensCompra itensCompra) {
         try {
             Optional<Compra> compra = compraRepository.findById(id);

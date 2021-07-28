@@ -1,5 +1,7 @@
 package com.techbank.japaoPadaria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +26,11 @@ public class Producao {
 
     @OneToMany(mappedBy = "producao")
     private List<ItensProducao> itensProducao;
+
+    @ManyToOne
+    @JoinColumn(name = "id_produto")
+    @JsonIgnoreProperties("producao")
+    private Produto produto;
 
     public Long getId() {
         return id;
@@ -65,4 +72,7 @@ public class Producao {
         this.itensProducao = itensProducao;
     }
 
+    public Produto getProduto() {
+        return produto;
+    }
 }
