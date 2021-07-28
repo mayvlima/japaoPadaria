@@ -25,7 +25,7 @@ public class ProdutoController {
     @Autowired
     ProdutoRepository produtoRepository;
 
-    @GetMapping()
+    @GetMapping("/listarTodos")
     public ResponseEntity<List<Produto>> getAllProdutos() {
         try {
 
@@ -41,7 +41,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/descricao")
+    @GetMapping("/buscar/descricao")
     public ResponseEntity<List<Produto>> getAllProdutosDescricao(@RequestBody Produto produto) {
         try {
             List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAllByDescricao(produto.getDescricao()));
@@ -56,7 +56,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/codigo")
+    @GetMapping("/buscar/codigoBarras")
     public ResponseEntity<Produto> getAllProdutosCodigo(@RequestBody Produto produto) {
         Optional<Produto> produtoDesejado = produtoRepository.findByCodigoDeBarras(produto.getCodigoDeBarras());
 
@@ -67,7 +67,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/ativos")
+    @GetMapping("/buscar/ativos")
     public ResponseEntity<List<Produto>> getAllProdutoAtivos() {
         try {
             List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAllByStatus(true));
@@ -85,7 +85,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/inativos")
+    @GetMapping("/buscar/inativos")
     public ResponseEntity<List<Produto>> getAllProdutoDesativados() {
         try {
             List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAllByStatus(false));
@@ -100,7 +100,7 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<Produto> getProdutoById(@PathVariable("id") long id) {
         Optional<Produto> produto = produtoRepository.findById(id);
 
@@ -111,7 +111,7 @@ public class ProdutoController {
         }
     }
 
-    @PostMapping()
+    @PostMapping("/criar")
     public ResponseEntity<Produto> createProduto(@RequestBody Produto produto) {
         try {
             Produto novoProduto = produtoRepository.save(produto);
@@ -121,7 +121,7 @@ public class ProdutoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<Produto> updateProduto(@PathVariable("id") long id, @RequestBody Produto produto) {
         Optional<Produto> produtoDesejado = produtoRepository.findById(id);
 

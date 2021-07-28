@@ -16,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,7 @@ public class ItensCompraController {
     @Autowired
     EstoqueRepository estoqueRepository;
 
-    @GetMapping()
+    @GetMapping("/listarTodos")
     public ResponseEntity<List<ItensCompra>> getAllItensCompra() {
         try {
 
@@ -59,7 +61,7 @@ public class ItensCompraController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("buscar/{id}")
     public ResponseEntity<List<ItensCompra>> getItensCompraByIdCompra(@PathVariable("id") long id) {
 
         try {
@@ -84,34 +86,22 @@ public class ItensCompraController {
         }
     }
 
-    @PostMapping()
-    public ResponseEntity<ItensCompra> createItensCompra(@RequestBody ItensCompra itensCompra) {
-        try {
-            Optional<Compra> compra = compraRepository.findById(itensCompra.getCompra().getId());
-            Optional<Produto> produto = produtoRepository.findById(itensCompra.getProduto().getId());
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<ItensCompra> updateItensCompra(@PathVariable("id") long id, @RequestBody ItensCompra itensCompra) {
+        Optional<ItensCompra> itensCompraDesejado = itensCompraRepository.findById(id);
 
+        if (itensCompraDesejado.isPresent()) {
+            ItensCompra atualizacao = itensCompraDesejado.get();
+            atualizacao.setQuantidade(itensCompra.getQuantidade());
+            atualizacao.setValorDeCusto(itensCompra.getValorDeCusto());
+            atualizacao.setCompra(itensCompra.getCompra());
+            atualizacao.setProduto(itensCompra.getProduto());
 
-            if (produto.isPresent() && compra.isPresent()) {
-
-                ItensCompra novoItensCompra = new ItensCompra(itensCompra.getQuantidade(),
-                        itensCompra.getValorDeCusto(),
-                        produto.get(),
-                        compra.get());
-
-                Estoque novaMovimentacao = new Estoque(itensCompra.getQuantidade(),
-                        LocalDateTime.now(),
-                        "compra",
-                        produto.get());
-
-                estoqueRepository.save(novaMovimentacao);
-
-                return new ResponseEntity<>(itensCompraRepository.save(novoItensCompra), HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(itensCompraRepository.save(atualizacao), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
 }

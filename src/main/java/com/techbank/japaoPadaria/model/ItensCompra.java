@@ -1,5 +1,7 @@
 package com.techbank.japaoPadaria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -75,6 +77,7 @@ public class ItensCompra {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
+
 
     public Compra getCompra() {
         return compra;

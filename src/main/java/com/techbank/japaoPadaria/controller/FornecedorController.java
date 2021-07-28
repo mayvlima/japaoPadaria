@@ -1,6 +1,7 @@
 package com.techbank.japaoPadaria.controller;
 
 import com.techbank.japaoPadaria.model.Fornecedor;
+import com.techbank.japaoPadaria.model.Produto;
 import com.techbank.japaoPadaria.repository.FornecedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,7 @@ public class FornecedorController {
     @Autowired
     FornecedorRepository fornecedorRepository;
 
-    @GetMapping()
+    @GetMapping("/listarTodos")
     public ResponseEntity<List<Fornecedor>> getAllFornecedores() {
         try {
 
@@ -39,7 +41,7 @@ public class FornecedorController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("buscar/{id}")
     public ResponseEntity<Fornecedor> getFornecedorById(@PathVariable("id") long id) {
         Optional<Fornecedor> fornecedor = fornecedorRepository.findById(id);
 
@@ -50,7 +52,7 @@ public class FornecedorController {
         }
     }
 
-    @PostMapping()
+    @PostMapping("/criar")
     public ResponseEntity<Fornecedor> createFornecedor(@RequestBody Fornecedor fornecedor) {
         try {
             Fornecedor novoFornecedor = fornecedorRepository
@@ -58,6 +60,21 @@ public class FornecedorController {
             return new ResponseEntity<>(novoFornecedor, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<Fornecedor> updateFornecedor(@PathVariable("id") long id, @RequestBody Fornecedor fornecedor) {
+        Optional<Fornecedor> fornecedorDesejado = fornecedorRepository.findById(id);
+
+        if (fornecedorDesejado.isPresent()) {
+            Fornecedor atualizacao = fornecedorDesejado.get();
+            atualizacao.setNome(fornecedor.getNome());
+            atualizacao.setCnpj(fornecedor.getCnpj());
+
+            return new ResponseEntity<>(fornecedorRepository.save(atualizacao), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

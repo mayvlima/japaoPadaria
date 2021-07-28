@@ -33,7 +33,7 @@ public class EstoqueController {
     @Autowired
     ProdutoRepository produtoRepository;
 
-    @GetMapping()
+    @GetMapping("/listarTodos")
     public ResponseEntity<List<Estoque>> getAllEstoque() {
         try {
 
@@ -51,7 +51,7 @@ public class EstoqueController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<List<Estoque>> getAllEstoqueByProduto(@PathVariable("id") long id) {
         try {
             Optional<Produto> produto = produtoRepository.findById(id);
@@ -81,7 +81,9 @@ public class EstoqueController {
         try {
             List<Estoque> estoque = new ArrayList<>();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+
             LocalDateTime fDataInical = LocalDateTime.parse(dataInicial, formatter);
             LocalDateTime fDataFinal = LocalDateTime.parse(dataFinal, formatter);
 
