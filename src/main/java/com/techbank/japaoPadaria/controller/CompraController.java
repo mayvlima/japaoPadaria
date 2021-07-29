@@ -3,12 +3,12 @@ package com.techbank.japaoPadaria.controller;
 import com.techbank.japaoPadaria.model.Compra;
 import com.techbank.japaoPadaria.model.Estoque;
 import com.techbank.japaoPadaria.model.Fornecedor;
-import com.techbank.japaoPadaria.model.ItensCompra;
+import com.techbank.japaoPadaria.model.ItemCompra;
 import com.techbank.japaoPadaria.model.Produto;
 import com.techbank.japaoPadaria.repository.CompraRepository;
 import com.techbank.japaoPadaria.repository.EstoqueRepository;
 import com.techbank.japaoPadaria.repository.FornecedorRepository;
-import com.techbank.japaoPadaria.repository.ItensCompraRepository;
+import com.techbank.japaoPadaria.repository.ItemCompraRepository;
 import com.techbank.japaoPadaria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +38,7 @@ public class CompraController {
     FornecedorRepository fornecedorRepository;
 
     @Autowired
-    ItensCompraRepository itensCompraRepository;
+    ItemCompraRepository itemCompraRepository;
 
     @Autowired
     ProdutoRepository produtoRepository;
@@ -53,9 +50,7 @@ public class CompraController {
     public ResponseEntity<List<Compra>> getAllCompras() {
         try {
 
-            List<Compra> compras = new ArrayList<Compra>();
-
-            compraRepository.findAll().forEach(compras::add);
+            List<Compra> compras = compraRepository.findAll();
 
             if (compras.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -78,7 +73,7 @@ public class CompraController {
         }
     }
 
-   @PostMapping
+    @PostMapping
     public ResponseEntity<Compra> createCompra(@RequestBody Fornecedor fornecedor) {
         try {
             Optional<Fornecedor> fornecedorCompra = fornecedorRepository.findById(fornecedor.getId());
@@ -89,6 +84,7 @@ public class CompraController {
                 Compra novaCompra = new Compra();
                 novaCompra.setDataDaCompra(LocalDateTime.now());
                 novaCompra.setFornecedor(fornecedorCompra.get());
+                novaCompra.setFinalizada(false);
 
                 return new ResponseEntity<>(compraRepository.save(novaCompra), HttpStatus.CREATED);
             } else {
@@ -101,21 +97,21 @@ public class CompraController {
         }
     }
 
-    @PostMapping("/adicionarProduto/{id}")
-    public ResponseEntity<ItensCompra> createItensCompra(@PathVariable("id") long id, @RequestBody ItensCompra itensCompra) {
+    @PostMapping("/adicionarproduto/{id}")
+    public ResponseEntity<ItemCompra> createItensCompra(@PathVariable("id") long id, @RequestBody ItemCompra itemCompra) {
         try {
             Optional<Compra> compra = compraRepository.findById(id);
-            Optional<Produto> produto = produtoRepository.findById(itensCompra.getProduto().getId());
+            Optional<Produto> produto = produtoRepository.findById(itemCompra.getProduto().getId());
 
 
-            if (produto.isPresent() && compra.isPresent()) {
+            if (produto.isPresent() && compra.isPresent() && !compra.get().isFinalizada()) {
 
-                ItensCompra novoItensCompra = new ItensCompra(itensCompra.getQuantidade(),
-                        itensCompra.getValorDeCusto(),
+                ItemCompra novoItemCompra = new ItemCompra(itemCompra.getQuantidade(),
+                        itemCompra.getValorDeCompra(),
                         produto.get(),
                         compra.get());
 
-                return new ResponseEntity<>(itensCompraRepository.save(novoItensCompra), HttpStatus.CREATED);
+                return new ResponseEntity<>(itemCompraRepository.save(novoItemCompra), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -126,61 +122,64 @@ public class CompraController {
     }
 
     @PutMapping("/finalizar/{id}")
-    public ResponseEntity<Compra> finalizarCompra(@PathVariable("id") long id) {
-        Optional<Compra> compraDesejada = compraRepository.findById(id);
+    public ResponseEntity finalizarCompra(@PathVariable("id") long id) {
+        try {
+            Optional<Compra> compraDesejada = compraRepository.findById(id);
 
-        if (compraDesejada.isPresent()) {
-            List<ItensCompra> itensCompras = new ArrayList<>();
+            if (compraDesejada.isPresent() && !compraDesejada.get().isFinalizada()) {
 
-            itensCompraRepository.findAllByCompra(compraDesejada.get()).forEach(itensCompras::add);
+                List<ItemCompra> itemCompras = itemCompraRepository.findAllByCompra(compraDesejada.get());
 
-            if(!itensCompras.isEmpty()){
-                for(ItensCompra item : itensCompras){
-                    Estoque novaMovimentacao = new Estoque(item.getQuantidade(),
-                            LocalDateTime.now(),
-                            "compra",
-                            item.getProduto());
-                    estoqueRepository.save(novaMovimentacao);
+                if (!itemCompras.isEmpty()) {
+                    for (ItemCompra item : itemCompras) {
+                        Estoque novaMovimentacao = new Estoque(item.getQuantidade(),
+                                LocalDateTime.now(),
+                                "compra",
+                                item.getProduto());
+                        estoqueRepository.save(novaMovimentacao);
+                    }
                 }
-            }
 
-            Compra atualizacao = compraDesejada.get();
-
-            BigDecimal valorTotal = itensCompraRepository.valorTotalCompra(id);
-
-            if(valorTotal != null){
+                Compra atualizacao = compraDesejada.get();
+                BigDecimal valorTotal = itemCompraRepository.valorTotalCompra(id);
+                atualizacao.setValorTotal(valorTotal);
                 atualizacao.setFornecedor(compraDesejada.get().getFornecedor());
+                atualizacao.setDataDaCompra(compraDesejada.get().getDataDaCompra());
+                atualizacao.setFinalizada(true);
+
+                return new ResponseEntity<>(compraRepository.save(atualizacao), HttpStatus.OK);
             }
 
-            atualizacao.setDataDaCompra(LocalDateTime.now());
-            atualizacao.setValorTotal(valorTotal);
+            return ResponseEntity.notFound().build();
 
-            return new ResponseEntity<>(compraRepository.save(atualizacao), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
-    }
+
 
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity cancelarCompra(@PathVariable("id") long id) {
         try {
             Optional<Compra> compraDesejada = compraRepository.findById(id);
 
-            if(compraDesejada.isPresent()){
-                List<ItensCompra> itensCompras = new ArrayList<>();
+            if (compraDesejada.isPresent() && !compraDesejada.get().isFinalizada()) {
 
-                itensCompraRepository.findAllByCompra(compraDesejada.get()).forEach(itensCompras::add);
+                List<ItemCompra> itemCompras = itemCompraRepository.findAllByCompra(compraDesejada.get());
 
-                if(!itensCompras.isEmpty()){
-                    for(ItensCompra item : itensCompras){
-                        itensCompraRepository.deleteById(item.getId());
+                if (!itemCompras.isEmpty()) {
+                    for (ItemCompra item : itemCompras) {
+                        itemCompraRepository.deleteById(item.getId());
                     }
                 }
 
                 compraRepository.deleteById(compraDesejada.get().getId());
+
+                return ResponseEntity.status(HttpStatus.OK).body("Compra cancelada");
             }
 
-            return ResponseEntity.status(HttpStatus.OK).body("Compra cancelada");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("");
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

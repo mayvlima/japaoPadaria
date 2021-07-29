@@ -23,26 +23,26 @@ public class Produto {
     @Column(nullable = false)
     private String descricao;
 
-    @Column(name = "valor_de_custo", nullable = false)
+    @Column(name = "valor_de_custo")
     private BigDecimal valorDeCusto;
 
-    @Column(name = "valor_de_venda", nullable = false)
+    @Column(name = "valor_de_venda")
     private BigDecimal valorDeVenda;
 
     @Column(name = "codigo_de_barras", nullable = false, unique = true)
     private String codigoDeBarras;
 
-    @Column(name = "quantidade_medida", nullable = false)
-    private BigDecimal quantidaDeMedida;
+    @Column(name = "quantidade_medida")
+    private BigDecimal quantidadeDeMedida;
 
-    @Column(name = "unidade_de_medida", nullable = false)
+    @Column(name = "unidade_de_medida")
     private String unidadeDeMedida;
 
     @Column(nullable = false)
     private boolean status;
 
     @OneToMany(mappedBy = "produto")
-    private List<ItensProducao> itensProducao;
+    private List<ItemProducao> itemProducao;
 
     @OneToMany(mappedBy = "produto")
     private List<Producao> producoes;
@@ -57,7 +57,7 @@ public class Produto {
         this.valorDeCusto = valorDeCusto;
         this.valorDeVenda = valorDeVenda;
         this.codigoDeBarras = codigoDeBarras;
-        this.quantidaDeMedida = quantidadeMedida;
+        this.quantidadeDeMedida = quantidadeMedida;
         this.unidadeDeMedida = unidadeDeMedida;
         this.status = status;
     }
@@ -102,12 +102,12 @@ public class Produto {
         this.codigoDeBarras = codigoDeBarras;
     }
 
-    public BigDecimal getQuantidaDeMedida() {
-        return quantidaDeMedida;
+    public BigDecimal getQuantidadeDeMedida() {
+        return quantidadeDeMedida;
     }
 
-    public void setQuantidaDeMedida(BigDecimal quantidaDeMedida) {
-        this.quantidaDeMedida = quantidaDeMedida;
+    public void setQuantidadeDeMedida(BigDecimal quantidadeDeMedida) {
+        this.quantidadeDeMedida = quantidadeDeMedida;
     }
 
     public String getUnidadeDeMedida() {
@@ -135,7 +135,7 @@ public class Produto {
                 ", valorDeCusto=" + valorDeCusto +
                 ", valorDeVenda=" + valorDeVenda +
                 ", codigoDeBarras='" + codigoDeBarras + '\'' +
-                ", quantidadeMedida=" + quantidaDeMedida +
+                ", quantidadeMedida=" + quantidadeDeMedida +
                 ", unidadeDeMedida=" + unidadeDeMedida +
                 ", status=" + status +
                 '}';

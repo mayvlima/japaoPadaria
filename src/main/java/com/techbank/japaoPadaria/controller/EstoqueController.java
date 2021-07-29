@@ -33,13 +33,11 @@ public class EstoqueController {
     @Autowired
     ProdutoRepository produtoRepository;
 
-    @GetMapping("/listarTodos")
+    @GetMapping
     public ResponseEntity<List<Estoque>> getAllEstoque() {
         try {
 
-            List<Estoque> estoque = new ArrayList<Estoque>();
-
-            estoqueRepository.findAll().forEach(estoque::add);
+            List<Estoque> estoque = estoqueRepository.findAll();
 
             if (estoque.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -51,15 +49,13 @@ public class EstoqueController {
         }
     }
 
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<List<Estoque>> getAllEstoqueByProduto(@PathVariable("id") long id) {
         try {
             Optional<Produto> produto = produtoRepository.findById(id);
 
             if (produto.isPresent()) {
-                List<Estoque> estoque = new ArrayList<Estoque>();
-
-                estoqueRepository.findAllByProduto(produto.get()).forEach(estoque::add);
+                List<Estoque> estoque = estoqueRepository.findAllByProduto(produto.get());
 
                 if (estoque.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -76,18 +72,19 @@ public class EstoqueController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<Estoque>> getAllEstoqueByData(@RequestParam String dataInicial,
-                                                             @RequestParam String dataFinal) {
+    public ResponseEntity<List<Estoque>> getAllEstoqueByData(@RequestParam String datainicial,
+                                                             @RequestParam String datafinal) {
         try {
-            List<Estoque> estoque = new ArrayList<>();
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            datainicial = datainicial + " 00:00:00";
+            datafinal = datafinal + " 23:59:59";
 
 
-            LocalDateTime fDataInical = LocalDateTime.parse(dataInicial, formatter);
-            LocalDateTime fDataFinal = LocalDateTime.parse(dataFinal, formatter);
+            LocalDateTime fDataInical = LocalDateTime.parse(datainicial, formatter);
+            LocalDateTime fDataFinal = LocalDateTime.parse(datafinal, formatter);
 
-            estoqueRepository.findAllByDataDeMovimentacaoBetween(fDataInical, fDataFinal).forEach(estoque::add);
+            List<Estoque> estoque = estoqueRepository.findAllByDataDeMovimentacaoBetween(fDataInical, fDataFinal);
 
             if (estoque.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

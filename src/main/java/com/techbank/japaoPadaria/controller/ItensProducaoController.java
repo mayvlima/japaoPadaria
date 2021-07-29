@@ -1,11 +1,9 @@
 package com.techbank.japaoPadaria.controller;
 
-import com.techbank.japaoPadaria.model.ItensProducao;
-import com.techbank.japaoPadaria.model.ItensReceita;
+import com.techbank.japaoPadaria.model.ItemProducao;
 import com.techbank.japaoPadaria.model.Producao;
 import com.techbank.japaoPadaria.model.Produto;
-import com.techbank.japaoPadaria.model.Receita;
-import com.techbank.japaoPadaria.repository.ItensProducaoRepository;
+import com.techbank.japaoPadaria.repository.ItemProducaoRepository;
 import com.techbank.japaoPadaria.repository.ProducaoRepository;
 import com.techbank.japaoPadaria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +20,7 @@ import java.util.Optional;
 public class ItensProducaoController {
 
     @Autowired
-    ItensProducaoRepository itensProducaoRepository;
+    ItemProducaoRepository itemProducaoRepository;
 
     @Autowired
     ProdutoRepository produtoRepository;
@@ -32,15 +29,14 @@ public class ItensProducaoController {
     ProducaoRepository producaoRepository;
 
     @GetMapping
-    public ResponseEntity<List<ItensProducao>> getAllItensProducao() {
+    public ResponseEntity<List<ItemProducao>> getAllItensProducao() {
         try {
-            List<ItensProducao> itensProducaos = new ArrayList<>();
-            itensProducaoRepository.findAll().forEach(itensProducaos::add);
+            List<ItemProducao> itemProducaos = itemProducaoRepository.findAll();
 
-            if (itensProducaos.isEmpty()) {
+            if (itemProducaos.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(itensProducaos, HttpStatus.OK);
+            return new ResponseEntity<>(itemProducaos, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -48,35 +44,45 @@ public class ItensProducaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItensProducao> getById(@PathVariable long id) {
-        return itensProducaoRepository.findById(id)
-                .map(response -> ResponseEntity.ok(response))
-                .orElse(ResponseEntity.notFound().build());
-    }
+    public ResponseEntity<List<ItemProducao>> getById(@PathVariable long id) {
+        try {
+            Optional<Producao> producao = producaoRepository.findById(id);
 
-    //TODO atualmente ele deixa criar sem informar os ids de produto e producao
-    @PostMapping
-    public ResponseEntity<ItensProducao> post(@RequestBody ItensProducao itensProducao) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(itensProducaoRepository.save(itensProducao));
+            if (producao.isPresent()) {
+                List<ItemProducao> itensProducao = itemProducaoRepository.findAllByProducao(producao.get());
+
+
+                if (itensProducao.isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                }
+
+                return new ResponseEntity<>(itensProducao, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping
-    public ResponseEntity<ItensProducao> adicionarItensNaProducao(@RequestBody ItensProducao itensProducao) {
+    public ResponseEntity<ItemProducao> adicionarItensNaProducao(@RequestBody ItemProducao itemProducao) {
         try {
-            Optional<Produto> verificaExistenciaDoProduto = produtoRepository.findById(itensProducao.getProduto().getId());
-            Optional<Producao> verificaExistenciaDoProducao = producaoRepository.findById(itensProducao.getProducao().getId());
+            Optional<Produto> verificaExistenciaDoProduto = produtoRepository.findById(itemProducao.getProduto().getId());
+            Optional<Producao> verificaExistenciaDoProducao = producaoRepository.findById(itemProducao.getProducao().getId());
 
 
             if (verificaExistenciaDoProduto.isPresent() && verificaExistenciaDoProducao.isPresent()) {
-                ItensProducao adicionaItem = new ItensProducao();
-                adicionaItem.setValorDeCusto(itensProducao.getValorDeCusto());
-                adicionaItem.setQuantidade(itensProducao.getQuantidade());
-                adicionaItem.setQuantidadeDeMedida(itensProducao.getQuantidadeDeMedida());
-                adicionaItem.setUnidadeDeMedida(itensProducao.getUnidadeDeMedida());
-                adicionaItem.setProducao(itensProducao.getProducao());
-                adicionaItem.setProduto(itensProducao.getProduto());
+                ItemProducao adicionaItem = new ItemProducao();
+                adicionaItem.setValorDeCusto(itemProducao.getValorDeCusto());
+                adicionaItem.setQuantidade(itemProducao.getQuantidade());
+                adicionaItem.setQuantidadeDeMedida(itemProducao.getQuantidadeDeMedida());
+                adicionaItem.setUnidadeDeMedida(itemProducao.getUnidadeDeMedida());
+                adicionaItem.setProducao(itemProducao.getProducao());
+                adicionaItem.setProduto(itemProducao.getProduto());
 
-                return new ResponseEntity<>(itensProducaoRepository.save(adicionaItem), HttpStatus.OK);
+                return new ResponseEntity<>(itemProducaoRepository.save(adicionaItem), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -84,12 +90,6 @@ public class ItensProducaoController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-    }
-
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
-        itensProducaoRepository.deleteById(id);
     }
 
 }

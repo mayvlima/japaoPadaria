@@ -25,11 +25,11 @@ public class FornecedorController {
     @Autowired
     FornecedorRepository fornecedorRepository;
 
-    @GetMapping("/listarTodos")
+    @GetMapping
     public ResponseEntity<List<Fornecedor>> getAllFornecedores() {
         try {
 
-            List<Fornecedor> fornecedores = new ArrayList<Fornecedor>(fornecedorRepository.findAll());
+            List<Fornecedor> fornecedores = fornecedorRepository.findAll();
 
             if (fornecedores.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -41,7 +41,7 @@ public class FornecedorController {
         }
     }
 
-    @GetMapping("buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Fornecedor> getFornecedorById(@PathVariable("id") long id) {
         Optional<Fornecedor> fornecedor = fornecedorRepository.findById(id);
 
@@ -52,7 +52,7 @@ public class FornecedorController {
         }
     }
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity<Fornecedor> createFornecedor(@RequestBody Fornecedor fornecedor) {
         try {
             Fornecedor novoFornecedor = fornecedorRepository
@@ -63,7 +63,7 @@ public class FornecedorController {
         }
     }
 
-    @PutMapping("/atualizar/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Fornecedor> updateFornecedor(@PathVariable("id") long id, @RequestBody Fornecedor fornecedor) {
         Optional<Fornecedor> fornecedorDesejado = fornecedorRepository.findById(id);
 

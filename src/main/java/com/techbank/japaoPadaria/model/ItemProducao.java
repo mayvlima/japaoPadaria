@@ -1,14 +1,13 @@
 package com.techbank.japaoPadaria.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "itens_producao")
-public class ItensProducao {
+@Table(name = "item_producao")
+public class ItemProducao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

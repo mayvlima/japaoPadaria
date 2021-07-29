@@ -1,5 +1,6 @@
 package com.techbank.japaoPadaria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -23,10 +24,14 @@ public class Producao {
     private LocalDateTime dataDeProducao;
 
     @Column(name = "quantidade")
-    private Integer quantidade;
+    private int quantidade;
 
-//    @OneToMany(mappedBy = "producao")
-//    private List<ItensProducao> itensProducao;
+    @Column(name = "finalizada")
+    private boolean finalizada;
+
+    @OneToMany(mappedBy = "producao")
+    @JsonIgnore
+    private List<ItemProducao> itemProducao;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
@@ -66,13 +71,13 @@ public class Producao {
         this.quantidade = quantidade;
     }
 
-//    public List<ItensProducao> getItensProducao() {
-//        return itensProducao;
-//    }
-//
-//    public void setItensProducao(List<ItensProducao> itensProducao) {
-//        this.itensProducao = itensProducao;
-//    }
+    public List<ItemProducao> getItemProducao() {
+        return itemProducao;
+    }
+
+    public void setItensProducao(List<ItemProducao> itensProducao) {
+        this.itemProducao = itensProducao;
+    }
 
     public Produto getProduto() {
         return produto;
@@ -82,6 +87,15 @@ public class Producao {
         this.produto = produto;
     }
 
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
+    }
 
+    public boolean isFinalizada() {
+        return finalizada;
+    }
 
+    public void setFinalizada(boolean finalizada) {
+        this.finalizada = finalizada;
+    }
 }

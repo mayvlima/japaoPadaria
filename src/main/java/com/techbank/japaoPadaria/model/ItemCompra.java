@@ -13,8 +13,8 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "itens_compra")
-public class ItensCompra {
+@Table(name = "item_compra")
+public class ItemCompra {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +23,8 @@ public class ItensCompra {
     @Column(nullable = false)
     private int quantidade;
 
-    @Column(name = "valor_de_custo", nullable = false)
-    private BigDecimal valorDeCusto;
+    @Column(name = "valor_da_compra", nullable = false)
+    private BigDecimal valorDeCompra;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
@@ -35,13 +35,13 @@ public class ItensCompra {
     private Compra compra;
 
 
-    public ItensCompra() {
+    public ItemCompra() {
 
     }
 
-    public ItensCompra(int quantidade, BigDecimal valorDeCusto, Produto produto, Compra compra) {
+    public ItemCompra(int quantidade, BigDecimal valorDeCusto, Produto produto, Compra compra) {
         this.quantidade = quantidade;
-        this.valorDeCusto = valorDeCusto;
+        this.valorDeCompra = valorDeCusto;
         this.produto = produto;
         this.compra = compra;
     }
@@ -62,12 +62,12 @@ public class ItensCompra {
         this.quantidade = quantidade;
     }
 
-    public BigDecimal getValorDeCusto() {
-        return valorDeCusto;
+    public BigDecimal getValorDeCompra() {
+        return valorDeCompra;
     }
 
-    public void setValorDeCusto(BigDecimal valorDeCusto) {
-        this.valorDeCusto = valorDeCusto;
+    public void setValorDeCompra(BigDecimal valorDeCompra) {
+        this.valorDeCompra = valorDeCompra;
     }
 
     public Produto getProduto() {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ProdutoController {
     public ResponseEntity<List<Produto>> getAllProdutos() {
         try {
 
-            List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAll());
+            List<Produto> produtos = produtoRepository.findAll();
 
             if (produtos.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -41,29 +42,34 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/buscar/descricao")
-    public ResponseEntity<List<Produto>> getAllProdutosDescricao(@RequestBody Produto produto) {
+    @GetMapping("/buscar")
+    public ResponseEntity getAllProdutosDescricao(@RequestParam(required = false) String descricao, @RequestParam (required = false) String codigodebarras) {
         try {
-            List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAllByDescricao(produto.getDescricao()));
 
-            if (produtos.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if(descricao != null){
+                List<Produto> produtoDescricao = produtoRepository.findAllByDescricao(descricao);
+
+                if(produtoDescricao.isEmpty()){
+                    return ResponseEntity.noContent().build();
+                }
+
+                return ResponseEntity.status(HttpStatus.OK).body(produtoDescricao);
             }
 
-            return new ResponseEntity<>(produtos, HttpStatus.OK);
+            if(codigodebarras != null){
+                Optional<Produto> produtoCodigo = produtoRepository.findByCodigoDeBarras(codigodebarras);
+
+                if(!produtoCodigo.isPresent()){
+                    return ResponseEntity.noContent().build();
+                }
+
+                return ResponseEntity.status(HttpStatus.OK).body(produtoCodigo);
+            }
+
+            return ResponseEntity.notFound().build();
+
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/buscar/codigoBarras")
-    public ResponseEntity<Produto> getAllProdutosCodigo(@RequestBody Produto produto) {
-        Optional<Produto> produtoDesejado = produtoRepository.findByCodigoDeBarras(produto.getCodigoDeBarras());
-
-        if (produtoDesejado.isPresent()) {
-            return new ResponseEntity<>(produtoDesejado.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -88,7 +94,7 @@ public class ProdutoController {
     @GetMapping("/buscar/inativos")
     public ResponseEntity<List<Produto>> getAllProdutoDesativados() {
         try {
-            List<Produto> produtos = new ArrayList<Produto>(produtoRepository.findAllByStatus(false));
+            List<Produto> produtos = produtoRepository.findAllByStatus(false);
 
             if (produtos.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -104,11 +110,7 @@ public class ProdutoController {
     public ResponseEntity<Produto> getProdutoById(@PathVariable("id") long id) {
         Optional<Produto> produto = produtoRepository.findById(id);
 
-        if (produto.isPresent()) {
-            return new ResponseEntity<>(produto.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return produto.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
@@ -131,7 +133,7 @@ public class ProdutoController {
             atualizacao.setValorDeCusto(produto.getValorDeCusto());
             atualizacao.setValorDeVenda(produto.getValorDeVenda());
             atualizacao.setCodigoDeBarras(produto.getCodigoDeBarras());
-            atualizacao.setQuantidaDeMedida(produto.getQuantidaDeMedida());
+            atualizacao.setQuantidadeDeMedida(produto.getQuantidadeDeMedida());
             atualizacao.setUnidadeDeMedida(produto.getUnidadeDeMedida());
             atualizacao.setStatus(produto.getStatus());
 
@@ -141,7 +143,7 @@ public class ProdutoController {
         }
     }
 
-    @PutMapping("/alterarStatus/{id}")
+    @PutMapping("/alterarstatus/{id}")
     public ResponseEntity<Produto> updateStatus(@PathVariable("id") long id, @RequestBody Produto produto) {
         Optional<Produto> produtoDesejado = produtoRepository.findById(id);
 
