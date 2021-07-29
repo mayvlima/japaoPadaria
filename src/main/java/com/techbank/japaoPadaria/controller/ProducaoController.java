@@ -100,7 +100,7 @@ public class ProducaoController {
                 return new ResponseEntity<>(producaoRepository.save(novaProducao), HttpStatus.OK);
 
 
-            } else {
+            } else {g
                 return ResponseEntity.status(HttpStatus.OK).body("Cadastre o Produto antes de produzi-lo");
             }
 
