@@ -36,6 +36,7 @@ public class ItensProducao {
     @JsonIgnore
     private Produto produto;
 
+
     public Long getId() {
         return id;
     }
@@ -91,5 +92,6 @@ public class ItensProducao {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
+
 
 }

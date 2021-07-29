@@ -80,9 +80,9 @@ public class ItensReceitaController {
             Optional<Receita> receita = receitaRepository.findById(itensReceita.getIdReceita().getId());
 
             if (receita.isPresent()) {
-                ItensReceita itensReceitas = new ItensReceita(itensReceita.getIdReceita(),
+                ItensReceita adicionaItensReceita = new ItensReceita(itensReceita.getIdReceita(),
                         itensReceita.getIdProduto(), itensReceita.getQuantidade());
-                return new ResponseEntity<>(itensReceitaRepository.save(itensReceitas), HttpStatus.OK);
+                return new ResponseEntity<>(itensReceitaRepository.save(adicionaItensReceita), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

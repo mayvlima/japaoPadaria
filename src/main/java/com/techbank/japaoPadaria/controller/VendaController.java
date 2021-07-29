@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/Venda")
+@RequestMapping("/venda")
 public class VendaController {
 
     @Autowired
@@ -45,4 +45,6 @@ public class VendaController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
 }

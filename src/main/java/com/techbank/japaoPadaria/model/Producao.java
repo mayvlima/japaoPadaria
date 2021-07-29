@@ -3,6 +3,7 @@ package com.techbank.japaoPadaria.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,15 +23,16 @@ public class Producao {
     private LocalDateTime dataDeProducao;
 
     @Column(name = "quantidade")
-    private int quantidade;
+    private Integer quantidade;
 
-    @OneToMany(mappedBy = "producao")
-    private List<ItensProducao> itensProducao;
+//    @OneToMany(mappedBy = "producao")
+//    private List<ItensProducao> itensProducao;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
     @JsonIgnoreProperties("producao")
     private Produto produto;
+
 
     public Long getId() {
         return id;
@@ -64,15 +66,22 @@ public class Producao {
         this.quantidade = quantidade;
     }
 
-    public List<ItensProducao> getItensProducao() {
-        return itensProducao;
-    }
-
-    public void setItensProducao(List<ItensProducao> itensProducao) {
-        this.itensProducao = itensProducao;
-    }
+//    public List<ItensProducao> getItensProducao() {
+//        return itensProducao;
+//    }
+//
+//    public void setItensProducao(List<ItensProducao> itensProducao) {
+//        this.itensProducao = itensProducao;
+//    }
 
     public Produto getProduto() {
         return produto;
     }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+
+
 }
