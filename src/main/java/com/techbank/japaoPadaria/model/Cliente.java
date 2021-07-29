@@ -24,6 +24,8 @@ public class Cliente {
     @Column
     private BigDecimal cpf;
 
+    //encapsulamento do campo.
+
     public Long getId() {
         return Id;
     }

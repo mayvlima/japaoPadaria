@@ -5,28 +5,42 @@ import java.math.BigDecimal;
 
 
 @Entity(name="ItemVenda") //Anotações
-
+@Table (name = "item_venda")
 public class ItemVenda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column(name = "Id_Venda")
-    private Integer IdVenda;
+    @Column(nullable = false)
+    private int Quantidade;
 
-    @Column(name = "Id_Produto")
-    private Integer IdProduto;
-
-    @Column(name = "Valor_Unidade")
-    private BigDecimal ValorUnidade;
-
-    @Column
-    private Integer Quantidade;
-
-    @Column(name = "Valor_de_Venda")
+    @Column(name = "valor_de_venda")
     private BigDecimal ValorDeVenda;
 
+    @ManyToOne
+    @JoinColumn(name = "produto")
+    private Produto produto;
+
+    @ManyToOne
+    @JoinColumn(name = "id_venda")
+    private Venda venda;
+
+    /*
+    @Column(name = "valor_unidade")
+    private BigDecimal ValorUnidade;
+    */
+
+    public ItemVenda() {
+
+    }
+
+    public ItemVenda(int quantidade, BigDecimal valorDeVenda, Produto produto, Venda venda) {
+        this.Quantidade = quantidade;
+        this.ValorDeVenda = valorDeVenda;
+        this.produto = produto;
+        this.venda = venda;
+    }
 
     public Long getId() {
         return Id;
@@ -36,36 +50,12 @@ public class ItemVenda {
         Id = id;
     }
 
-    public Integer getIdVenda() {
-        return IdVenda;
-    }
-
-    public void setIdVenda(Integer idVenda) {
-        IdVenda = idVenda;
-    }
-
-    public Integer getIdProduto() {
-        return IdProduto;
-    }
-
-    public void setIdProduto(Integer idProduto) {
-        IdProduto = idProduto;
-    }
-
-    public BigDecimal getValorUnidade() {
-        return ValorUnidade;
-    }
-
-    public void setValorUnidade(BigDecimal valorUnidade) {
-        ValorUnidade = valorUnidade;
-    }
-
-    public Integer getQuantidade() {
+    public int getQuantidade() {
         return Quantidade;
     }
 
-    public void setQuantidade(Integer quantidade) {
-        Quantidade = quantidade;
+    public void setQuantidade(int quantidade) {
+        this.Quantidade = quantidade;
     }
 
     public BigDecimal getValorDeVenda() {
@@ -73,6 +63,35 @@ public class ItemVenda {
     }
 
     public void setValorDeVenda(BigDecimal valorDeVenda) {
-        ValorDeVenda = valorDeVenda;
+        this.ValorDeVenda = valorDeVenda;
     }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    public Venda getVenda() {
+        return venda;
+    }
+
+    public void setVenda(Venda venda) {
+        this.venda = venda;
+    }
+
+    /*
+    public BigDecimal getValorUnidade() {
+        return ValorUnidade;
+    }
+
+    public void setValorUnidade(BigDecimal valorUnidade) {
+        this.ValorUnidade = valorUnidade;
+    }
+
+     */
 }
+
+
