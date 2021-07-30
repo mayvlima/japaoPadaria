@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/itensproducao")
+@RequestMapping("/producao/itens")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ItensProducaoController {
 

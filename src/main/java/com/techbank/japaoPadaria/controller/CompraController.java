@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public class CompraController {
     public ResponseEntity<List<Compra>> getAllCompras() {
         try {
 
-            List<Compra> compras = compraRepository.findAll();
+            List<Compra> compras = new ArrayList<>(compraRepository.findAll());
 
             if (compras.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -86,16 +87,18 @@ public class CompraController {
                 novaCompra.setFornecedor(fornecedorCompra.get());
                 novaCompra.setFinalizada(false);
 
-                return new ResponseEntity<>(compraRepository.save(novaCompra), HttpStatus.CREATED);
+                compraRepository.save(novaCompra);
+                return new ResponseEntity<>(novaCompra, HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
 
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     @PostMapping("/adicionarproduto/{id}")
     public ResponseEntity<ItemCompra> createItensCompra(@PathVariable("id") long id, @RequestBody ItemCompra itemCompra) {
@@ -152,10 +155,10 @@ public class CompraController {
 
             return ResponseEntity.notFound().build();
 
-        }catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
 
     @DeleteMapping("/cancelar/{id}")

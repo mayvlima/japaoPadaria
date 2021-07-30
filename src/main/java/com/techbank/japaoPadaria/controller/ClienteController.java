@@ -41,7 +41,7 @@ public class ClienteController {
         }
     }
 
-    @GetMapping("buscar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Cliente> getClienteById(@PathVariable("id") long id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
 
@@ -52,7 +52,7 @@ public class ClienteController {
         }
     }
 
-    @PostMapping("/criar")
+    @PostMapping()
     public ResponseEntity<Cliente> createCliente(@RequestBody Cliente cliente) {
         try {
             Cliente novoCliente = clienteRepository.save(cliente);

@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import com.techbank.japaoPadaria.repository.ItemVendaRepository;
 
 
@@ -41,7 +42,7 @@ public class VendaController {
         try {
 
             List<Venda> venda = new ArrayList<Venda>(vendaRepository.findAll());
-            
+
 
             if (venda.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -66,7 +67,7 @@ public class VendaController {
 
     //TODO TESTAR
     @GetMapping("/buscarVenda")
-    public ResponseEntity<List<Venda>> getAllVendaByData(@RequestParam String dataInicial,@RequestParam String dataFinal) {
+    public ResponseEntity<List<Venda>> getAllVendaByData(@RequestParam String dataInicial, @RequestParam String dataFinal) {
         try {
             List<Venda> venda = new ArrayList<>();
 
@@ -116,14 +117,24 @@ public class VendaController {
         try {
             Optional<Venda> venda = vendaRepository.findById(id);
             Optional<Produto> produto = produtoRepository.findById(itemVenda.getProduto().getId());
+            Boolean possuiEstoque = estoqueRepository.quantidadeTotal(produto.get().getId()) >= itemVenda.getQuantidade();
 
 
-            if (produto.isPresent() && venda.isPresent()) {
+            if (produto.isPresent() && venda.isPresent() && possuiEstoque) {
 
-                ItemVenda novoItemVenda = new ItemVenda(itemVenda.getQuantidade(),
-                        itemVenda.getValorDeVenda(),
-                        produto.get(),
-                        venda.get());
+                ItemVenda novoItemVenda = new ItemVenda();
+                novoItemVenda.setQuantidade(itemVenda.getQuantidade());
+                novoItemVenda.setValorUnidade(itemVenda.getValorUnidade());
+                novoItemVenda.setValorDeVenda(itemVenda.getValorUnidade().multiply(BigDecimal.valueOf(itemVenda.getQuantidade())));
+                novoItemVenda.setProduto(produto.get());
+                novoItemVenda.setVenda(venda.get());
+
+                Estoque novaMovimentacao = new Estoque(-novoItemVenda.getQuantidade(),
+                        LocalDateTime.now(),
+                        "vendido",
+                        novoItemVenda.getProduto());
+                estoqueRepository.save(novaMovimentacao);
+
 
                 return new ResponseEntity<>(itemVendaRepository.save(novoItemVenda), HttpStatus.CREATED);
             } else {
@@ -138,49 +149,46 @@ public class VendaController {
 
     @PutMapping("/finalizar/{id}")
     public ResponseEntity<Venda> finalizarVenda(@PathVariable("id") long id) {
-        Optional<Venda> vendaDesejada = vendaRepository.findById(id);
-
-        if (vendaDesejada.isPresent()) {
-            List<ItemVenda> itemVenda = itemVendaRepository.findAllByVenda(vendaDesejada.get());
+        try {
+            Optional<Venda> vendaDesejada = vendaRepository.findById(id);
 
 
-            if(!itemVenda.isEmpty()){
-                for(ItemVenda itemVenda1 : itemVenda){
-                    Estoque novaMovimentacao = new Estoque(itemVenda1.getQuantidade(),
-                            LocalDateTime.now(),
-                            "venda",
-                            itemVenda1.getProduto());
-                    estoqueRepository.save(novaMovimentacao);
+            if (vendaDesejada.isPresent()) {
+                List<ItemVenda> itemVenda = itemVendaRepository.findAllByVenda(vendaDesejada.get());
+
+                Venda atualizacao = vendaDesejada.get();
+
+                BigDecimal valorTotal = itemVendaRepository.valorTotalVenda(id);
+
+                if (valorTotal != null) {
+                    atualizacao.setICliente(vendaDesejada.get().getCliente());
                 }
+
+                atualizacao.setDataDaVenda(LocalDateTime.now());
+                atualizacao.setValorTotal(valorTotal);
+
+                return new ResponseEntity<>(vendaRepository.save(atualizacao), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            Venda atualizacao = vendaDesejada.get();
-
-            BigDecimal valorTotal = itemVendaRepository.valorTotalVenda(id);
-
-            if(valorTotal != null){
-                atualizacao.setICliente(vendaDesejada.get().getCliente());
-            }
-
-            atualizacao.setDataDaVenda(LocalDateTime.now());
-            atualizacao.setValorTotal(valorTotal);
-
-            return new ResponseEntity<>(vendaRepository.save(atualizacao), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (
+                Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
+
 
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity cancelarVenda(@PathVariable("id") long id) {
         try {
             Optional<Venda> vendaDesejada = vendaRepository.findById(id);
 
-            if(vendaDesejada.isPresent()){
-                List<ItemVenda> itemVenda =  itemVendaRepository.findAllByVenda(vendaDesejada.get());
+            if (vendaDesejada.isPresent()) {
+                List<ItemVenda> itemVenda = itemVendaRepository.findAllByVenda(vendaDesejada.get());
 
-                if(!itemVenda.isEmpty()){
-                    for(ItemVenda item : itemVenda){
+                if (!itemVenda.isEmpty()) {
+                    for (ItemVenda item : itemVenda) {
                         itemVendaRepository.deleteById(item.getId());
                     }
                 }

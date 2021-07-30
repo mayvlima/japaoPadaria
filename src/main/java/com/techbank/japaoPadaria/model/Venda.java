@@ -52,9 +52,8 @@ public class Venda {
     }
 
     public LocalDateTime getDataDaVenda() {
-        return getDataDaVenda();
+        return dataDaVenda;
     }
-
 
     public void setDataDaVenda(LocalDateTime dataDaVenda) {
         this.dataDaVenda = dataDaVenda;

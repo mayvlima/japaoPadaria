@@ -55,8 +55,7 @@ public class FornecedorController {
     @PostMapping
     public ResponseEntity<Fornecedor> createFornecedor(@RequestBody Fornecedor fornecedor) {
         try {
-            Fornecedor novoFornecedor = fornecedorRepository
-                    .save(fornecedor);
+            Fornecedor novoFornecedor = fornecedorRepository.save(fornecedor);
             return new ResponseEntity<>(novoFornecedor, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/itensreceita")
+@RequestMapping("/receita/itens")
 public class ItensReceitaController {
 
     @Autowired

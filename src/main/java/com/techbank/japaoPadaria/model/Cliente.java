@@ -20,7 +20,7 @@ public class Cliente {
     @Column
     private String Nome;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String cpf;
 
     //encapsulamento do campo.
