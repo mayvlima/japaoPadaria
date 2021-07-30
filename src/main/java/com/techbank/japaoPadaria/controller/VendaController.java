@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,32 @@ public class VendaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    //TODO TESTAR
+    @GetMapping("/buscarVenda")
+    public ResponseEntity<List<Venda>> getAllVendaByData(@RequestParam String dataInicial,@RequestParam String dataFinal) {
+        try {
+            List<Venda> venda = new ArrayList<>();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+
+            LocalDateTime fDataInical = LocalDateTime.parse(dataInicial, formatter);
+            LocalDateTime fDataFinal = LocalDateTime.parse(dataFinal, formatter);
+
+            vendaRepository.findAllByDataDeMovimentacaoBetween(fDataInical, fDataFinal).forEach(venda::add);
+
+            if (venda.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(venda, HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @PostMapping
     public ResponseEntity<Venda> createVenda(@RequestBody Cliente cliente) {
