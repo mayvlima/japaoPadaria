@@ -76,8 +76,6 @@ public class ProducaoController {
 
 
             } else {
-//                produtoController.createProduto(producao.getProduto()).getBody();
-//                criaProducao(producao);
                 return ResponseEntity.status(HttpStatus.OK).body("Cadastre o Produto antes de produzi-lo");
             }
 

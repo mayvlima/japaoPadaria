@@ -25,7 +25,7 @@ public class ClienteController {
     @Autowired
     ClienteRepository clienteRepository;
 
-    @GetMapping("/listarTodos")
+    @GetMapping
     public ResponseEntity<List<Cliente>> getAllCliente() {
         try {
 
@@ -55,8 +55,7 @@ public class ClienteController {
     @PostMapping("/criar")
     public ResponseEntity<Cliente> createCliente(@RequestBody Cliente cliente) {
         try {
-            Cliente novoCliente = clienteRepository
-                    .save(cliente);
+            Cliente novoCliente = clienteRepository.save(cliente);
             return new ResponseEntity<>(novoCliente, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

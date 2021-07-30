@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Cliente")
@@ -22,7 +21,7 @@ public class Cliente {
     private String Nome;
 
     @Column
-    private BigDecimal cpf;
+    private String cpf;
 
     //encapsulamento do campo.
 
@@ -42,11 +41,11 @@ public class Cliente {
         Nome = nome;
     }
 
-    public BigDecimal getCpf() {
+    public String getCpf() {
         return cpf;
     }
 
-    public void setCpf(BigDecimal cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
@@ -55,7 +54,7 @@ public class Cliente {
         return "Cliente{" +
                 "id=" + Id +
                 ", nome='" + Nome + '\'' +
-                ", cnpj='" + cpf + '\'' +
+                ", cpf='" + cpf + '\'' +
                 '}';
     }
 }

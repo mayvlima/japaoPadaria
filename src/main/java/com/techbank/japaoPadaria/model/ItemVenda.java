@@ -90,7 +90,6 @@ public class ItemVenda {
     public void setValorUnidade(BigDecimal valorUnidade) {
         this.ValorUnidade = valorUnidade;
     }
-
      */
 }
 
