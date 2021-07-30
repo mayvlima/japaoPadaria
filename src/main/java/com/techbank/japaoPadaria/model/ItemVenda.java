@@ -22,7 +22,7 @@ public class ItemVenda {
     private BigDecimal valorDeVenda;
 
     @ManyToOne
-    @JoinColumn(name = "produto")
+    @JoinColumn(name = "id_produto")
     private Produto produto;
 
     @ManyToOne

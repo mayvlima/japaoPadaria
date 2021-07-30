@@ -20,5 +20,8 @@ import java.util.List;
         @Query(value = "SELECT SUM(valor_de_venda) FROM item_venda where id_venda = :id_venda", nativeQuery = true)
         public BigDecimal valorTotalVenda(@Param("id_venda") Long idVenda);
 
+        @Query(value = "SELECT * FROM item_venda WHERE id_venda = :id_venda AND id_produto = :id_produto", nativeQuery = true)
+        List<ItemVenda> findAllProdutosInVenda(@Param("id_venda") Long idVenda, @Param("id_produto") Long idProduto);
+
     }
 

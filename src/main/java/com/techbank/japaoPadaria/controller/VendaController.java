@@ -154,25 +154,22 @@ public class VendaController {
 
 
             if (vendaDesejada.isPresent()) {
-                List<ItemVenda> itemVenda = itemVendaRepository.findAllByVenda(vendaDesejada.get());
 
                 Venda atualizacao = vendaDesejada.get();
 
                 BigDecimal valorTotal = itemVendaRepository.valorTotalVenda(id);
 
-                if (valorTotal != null) {
-                    atualizacao.setICliente(vendaDesejada.get().getCliente());
+                if (valorTotal == null) {
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                } else {
+                    atualizacao.setValorTotal(valorTotal);
+
+                    return new ResponseEntity<>(vendaRepository.save(atualizacao), HttpStatus.OK);
                 }
-
-                atualizacao.setDataDaVenda(LocalDateTime.now());
-                atualizacao.setValorTotal(valorTotal);
-
-                return new ResponseEntity<>(vendaRepository.save(atualizacao), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -190,6 +187,11 @@ public class VendaController {
                 if (!itemVenda.isEmpty()) {
                     for (ItemVenda item : itemVenda) {
                         itemVendaRepository.deleteById(item.getId());
+                        Estoque novaMovimentacao = new Estoque(item.getQuantidade(),
+                                LocalDateTime.now(),
+                                "estornado",
+                                item.getProduto());
+                        estoqueRepository.save(novaMovimentacao);
                     }
                 }
                 vendaRepository.deleteById(vendaDesejada.get().getId());
@@ -200,4 +202,26 @@ public class VendaController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping("/cancelar/itens/{id}")
+    public ResponseEntity cancelarItemVenda(@PathVariable("id") long id) {
+        try {
+            Optional<ItemVenda> itensDaVenda = itemVendaRepository.findById(id);
+
+            if (itensDaVenda.isPresent()) {
+                itemVendaRepository.deleteById(id);
+                Estoque novaMovimentacao = new Estoque(itensDaVenda.get().getQuantidade(),
+                        LocalDateTime.now(),
+                        "estornado",
+                        itensDaVenda.get().getProduto());
+                estoqueRepository.save(novaMovimentacao);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body("Venda cancelada");
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
+
