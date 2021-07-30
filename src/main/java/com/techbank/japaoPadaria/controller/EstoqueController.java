@@ -49,7 +49,7 @@ public class EstoqueController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/movimentacao/{id}")
     public ResponseEntity<List<Estoque>> getAllEstoqueByProduto(@PathVariable("id") long id) {
         try {
             Optional<Produto> produto = produtoRepository.findById(id);
@@ -62,6 +62,24 @@ public class EstoqueController {
                 }
 
                 return new ResponseEntity<>(estoque, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getSomaEstoqueByProduto(@PathVariable("id") long id) {
+        try {
+            Optional<Produto> produto = produtoRepository.findById(id);
+
+            if (produto.isPresent()) {
+                Integer estoque = estoqueRepository.quantidadeTotal(produto.get().getId());
+
+                return ResponseEntity.ok().body("Estoque atual " + produto.get().getDescricao() + ": " + estoque);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

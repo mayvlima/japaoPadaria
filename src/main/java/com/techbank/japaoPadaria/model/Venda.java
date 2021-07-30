@@ -27,15 +27,18 @@ public class Venda {
     @Column(name = "data_da_venda")
     private LocalDateTime dataDaVenda;
 
-    @Column(name="Valor_total")
+    @Column(name="valor_total")
     private BigDecimal valorTotal;
 
     @ManyToOne //usada para associar duas entidades.
-    @JoinColumn(name="Id_Cliente")//responsavel pelo relacionamento
+    @JoinColumn(name="id_cliente")//responsavel pelo relacionamento
     private Cliente cliente;
 
     @OneToMany(mappedBy = "venda")//indica o lado não dominante da relação.
     List<ItemVenda> itemVenda;
+
+    @Column(name = "finalizada")
+    private boolean finalizada;
 
     public Venda(){
 
@@ -75,5 +78,13 @@ public class Venda {
     public void setICliente(Cliente cliente) {
 
         this.cliente = cliente;
+    }
+
+    public boolean isFinalizada() {
+        return finalizada;
+    }
+
+    public void setFinalizada(boolean finalizada) {
+        this.finalizada = finalizada;
     }
 }

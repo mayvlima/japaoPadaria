@@ -65,19 +65,19 @@ public class VendaController {
         }
     }
 
-    //TODO TESTAR
-    @GetMapping("/buscarVenda")
-    public ResponseEntity<List<Venda>> getAllVendaByData(@RequestParam String dataInicial, @RequestParam String dataFinal) {
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Venda>> getAllVendaByData(@RequestParam String datainicial, @RequestParam String datafinal) {
         try {
-            List<Venda> venda = new ArrayList<>();
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            datainicial = datainicial + " 00:00:00";
+            datafinal = datafinal + " 23:59:59";
 
 
-            LocalDateTime fDataInical = LocalDateTime.parse(dataInicial, formatter);
-            LocalDateTime fDataFinal = LocalDateTime.parse(dataFinal, formatter);
+            LocalDateTime fDataInical = LocalDateTime.parse(datainicial, formatter);
+            LocalDateTime fDataFinal = LocalDateTime.parse(datafinal, formatter);
 
-            vendaRepository.findAllByDataDeMovimentacaoBetween(fDataInical, fDataFinal).forEach(venda::add);
+            List<Venda> venda = vendaRepository.findAllByDataDaVendaBetween(fDataInical, fDataFinal);
 
             if (venda.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -91,36 +91,42 @@ public class VendaController {
     }
 
 
-    @PostMapping
-    public ResponseEntity<Venda> createVenda(@RequestBody Cliente cliente) {
+   @PostMapping
+    public ResponseEntity<Venda> createVenda(@RequestBody(required = false) Cliente cliente) {
         try {
-            Optional<Cliente> clienteVenda = clienteRepository.findById(cliente.getId());
 
-            if (clienteVenda.isPresent()) {
+            Venda novaVenda = new Venda();
+            novaVenda.setDataDaVenda(LocalDateTime.now());
+            novaVenda.setFinalizada(false);
 
-                Venda novaVenda = new Venda();
-                novaVenda.setDataDaVenda(LocalDateTime.now());
-                novaVenda.setICliente(clienteVenda.get());
+            if( cliente != null) {
+                Optional<Cliente> clienteVenda = clienteRepository.findById(cliente.getId());
 
-                return new ResponseEntity<>(vendaRepository.save(novaVenda), HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                if (clienteVenda.isPresent()) {
+                    novaVenda.setICliente(clienteVenda.get());
+                }else{
+                    return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+                }
             }
+
+            return new ResponseEntity<>(vendaRepository.save(novaVenda), HttpStatus.CREATED);
 
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/adicionarProduto/{id}")
-    public ResponseEntity<ItemVenda> createItemVenda(@PathVariable("id") long id, @RequestBody ItemVenda itemVenda) {
+
+
+    @PostMapping("/adicionarproduto/{id}")
+    public ResponseEntity createItemVenda(@PathVariable("id") long id, @RequestBody ItemVenda itemVenda) {
         try {
             Optional<Venda> venda = vendaRepository.findById(id);
             Optional<Produto> produto = produtoRepository.findById(itemVenda.getProduto().getId());
             Boolean possuiEstoque = estoqueRepository.quantidadeTotal(produto.get().getId()) >= itemVenda.getQuantidade();
 
 
-            if (produto.isPresent() && venda.isPresent() && possuiEstoque) {
+            if (produto.isPresent() && venda.isPresent() && possuiEstoque && !venda.get().isFinalizada()) {
 
                 ItemVenda novoItemVenda = new ItemVenda();
                 novoItemVenda.setQuantidade(itemVenda.getQuantidade());
@@ -131,14 +137,14 @@ public class VendaController {
 
                 Estoque novaMovimentacao = new Estoque(-novoItemVenda.getQuantidade(),
                         LocalDateTime.now(),
-                        "vendido",
+                        "venda",
                         novoItemVenda.getProduto());
                 estoqueRepository.save(novaMovimentacao);
 
 
                 return new ResponseEntity<>(itemVendaRepository.save(novoItemVenda), HttpStatus.CREATED);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido adicionar um produto a uma venda que não existe ou já foi finalizada");
             }
 
         } catch (Exception e) {
@@ -152,8 +158,7 @@ public class VendaController {
         try {
             Optional<Venda> vendaDesejada = vendaRepository.findById(id);
 
-
-            if (vendaDesejada.isPresent()) {
+        if (vendaDesejada.isPresent() && !vendaDesejada.get().isFinalizada()) {
 
                 Venda atualizacao = vendaDesejada.get();
 
@@ -163,6 +168,7 @@ public class VendaController {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 } else {
                     atualizacao.setValorTotal(valorTotal);
+                    atualizacao.setFinalizada(true);
 
                     return new ResponseEntity<>(vendaRepository.save(atualizacao), HttpStatus.OK);
                 }
@@ -181,7 +187,7 @@ public class VendaController {
         try {
             Optional<Venda> vendaDesejada = vendaRepository.findById(id);
 
-            if (vendaDesejada.isPresent()) {
+            if (vendaDesejada.isPresent() && !vendaDesejada.get().isFinalizada()) {
                 List<ItemVenda> itemVenda = itemVendaRepository.findAllByVenda(vendaDesejada.get());
 
                 if (!itemVenda.isEmpty()) {
@@ -189,15 +195,17 @@ public class VendaController {
                         itemVendaRepository.deleteById(item.getId());
                         Estoque novaMovimentacao = new Estoque(item.getQuantidade(),
                                 LocalDateTime.now(),
-                                "estornado",
+                                "estorno",
                                 item.getProduto());
                         estoqueRepository.save(novaMovimentacao);
                     }
                 }
                 vendaRepository.deleteById(vendaDesejada.get().getId());
+
+                return ResponseEntity.status(HttpStatus.OK).body("Venda cancelada");
             }
 
-            return ResponseEntity.status(HttpStatus.OK).body("Venda cancelada");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido cancelar uma venda que não existe ou já foi finalizada");
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -208,16 +216,19 @@ public class VendaController {
         try {
             Optional<ItemVenda> itensDaVenda = itemVendaRepository.findById(id);
 
-            if (itensDaVenda.isPresent()) {
+            if (itensDaVenda.isPresent() && !itensDaVenda.get().getVenda().isFinalizada()) {
                 itemVendaRepository.deleteById(id);
                 Estoque novaMovimentacao = new Estoque(itensDaVenda.get().getQuantidade(),
                         LocalDateTime.now(),
-                        "estornado",
+                        "estorno",
                         itensDaVenda.get().getProduto());
                 estoqueRepository.save(novaMovimentacao);
+
+                return ResponseEntity.status(HttpStatus.OK).body("Item estornado da venda");
             }
 
-            return ResponseEntity.status(HttpStatus.OK).body("Venda cancelada");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido cancelar uma venda que não existe ou já foi finalizada");
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
