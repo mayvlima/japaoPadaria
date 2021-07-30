@@ -17,7 +17,7 @@ import com.techbank.japaoPadaria.repository.ItemVendaRepository;
 
 
 @RestController
-@RequestMapping("/Venda")
+@RequestMapping("/venda")
 public class VendaController {
 
     @Autowired
@@ -40,10 +40,8 @@ public class VendaController {
     public ResponseEntity<List<Venda>> getAllVendas() {
         try {
 
-            List<Venda> venda = new ArrayList<Venda>();
-
-            vendaRepository.findAll().forEach(venda::add);
-            //:: referência de método.
+            List<Venda> venda = new ArrayList<Venda>(vendaRepository.findAll());
+            
 
             if (venda.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -24,11 +24,11 @@ public class Venda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column
-    private LocalDateTime Data;
+    @Column(name = "data_da_venda")
+    private LocalDateTime dataDaVenda;
 
     @Column(name="Valor_total")
-    private BigDecimal ValorTotal;
+    private BigDecimal valorTotal;
 
     @ManyToOne //usada para associar duas entidades.
     @JoinColumn(name="Id_Cliente")//responsavel pelo relacionamento
@@ -57,15 +57,15 @@ public class Venda {
 
 
     public void setDataDaVenda(LocalDateTime dataDaVenda) {
-        this.Data = dataDaVenda;
+        this.dataDaVenda = dataDaVenda;
     }
 
     public BigDecimal getValorTotal() {
-        return ValorTotal;
+        return valorTotal;
     }
 
     public void setValorTotal(BigDecimal valorTotal) {
-        this.ValorTotal = valorTotal;
+        this.valorTotal = valorTotal;
     }
 
     public Cliente getCliente() {
