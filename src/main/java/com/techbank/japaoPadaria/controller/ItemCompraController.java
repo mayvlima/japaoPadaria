@@ -71,39 +71,5 @@ public class ItemCompraController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ItemCompra> updateItensCompra(@PathVariable("id") long id, @RequestBody ItemCompra itemCompra) {
-        try {
-            Optional<ItemCompra> itemCompraDesejado = itemCompraRepository.findById(id);
-
-            if (itemCompraDesejado.isPresent()) {
-                ItemCompra atualizacao = itemCompraDesejado.get();
-                atualizacao.setQuantidade(itemCompra.getQuantidade());
-                atualizacao.setValorDeCompra(itemCompra.getValorDeCompra());
-                atualizacao.setCompra(itemCompraDesejado.get().getCompra());
-                atualizacao.setProduto(itemCompraDesejado.get().getProduto());
-
-                return new ResponseEntity<>(itemCompraRepository.save(atualizacao), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-        }catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<ItemCompra> deleteItemCompra(@PathVariable("id") long id) {
-        try{
-            itemCompraRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-
 
 }

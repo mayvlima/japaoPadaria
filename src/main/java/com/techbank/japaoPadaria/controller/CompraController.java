@@ -4,6 +4,7 @@ import com.techbank.japaoPadaria.model.Compra;
 import com.techbank.japaoPadaria.model.Estoque;
 import com.techbank.japaoPadaria.model.Fornecedor;
 import com.techbank.japaoPadaria.model.ItemCompra;
+import com.techbank.japaoPadaria.model.ItemVenda;
 import com.techbank.japaoPadaria.model.Produto;
 import com.techbank.japaoPadaria.repository.CompraRepository;
 import com.techbank.japaoPadaria.repository.EstoqueRepository;
@@ -109,10 +110,13 @@ public class CompraController {
 
             if (produto.isPresent() && compra.isPresent() && !compra.get().isFinalizada()) {
 
-                ItemCompra novoItemCompra = new ItemCompra(itemCompra.getQuantidade(),
-                        itemCompra.getValorDeCompra(),
-                        produto.get(),
-                        compra.get());
+                ItemCompra novoItemCompra = new ItemCompra();
+
+               novoItemCompra.setQuantidade(itemCompra.getQuantidade());
+               novoItemCompra.setValorUnidade(itemCompra.getValorUnidade());
+               novoItemCompra.setValorDeCompra(itemCompra.getValorUnidade().multiply(BigDecimal.valueOf(itemCompra.getQuantidade())));
+               novoItemCompra.setProduto(produto.get());
+               novoItemCompra.setCompra(compra.get());
 
                 return new ResponseEntity<>(itemCompraRepository.save(novoItemCompra), HttpStatus.CREATED);
             } else {
@@ -182,6 +186,24 @@ public class CompraController {
             }
 
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("");
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/cancelar/itens/{id}")
+    public ResponseEntity cancelarItemCompra(@PathVariable("id") long id) {
+        try {
+            Optional<ItemCompra> itensDaCompra = itemCompraRepository.findById(id);
+
+            if (itensDaCompra.isPresent() && !itensDaCompra.get().getCompra().isFinalizada()) {
+                itemCompraRepository.deleteById(id);
+
+                return ResponseEntity.status(HttpStatus.OK).body("Item estornado da compra");
+            }
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido cancelar uma compra que não existe ou já foi finalizada");
 
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -23,7 +23,10 @@ public class ItemCompra {
     @Column(nullable = false)
     private int quantidade;
 
-    @Column(name = "valor_da_compra", nullable = false)
+    @Column(name = "valor_unidade", nullable = false)
+    private BigDecimal valorUnidade;
+
+    @Column(name = "valor_da_compra")
     private BigDecimal valorDeCompra;
 
     @ManyToOne
@@ -78,12 +81,19 @@ public class ItemCompra {
         this.produto = produto;
     }
 
-
     public Compra getCompra() {
         return compra;
     }
 
     public void setCompra(Compra compra) {
         this.compra = compra;
+    }
+
+    public BigDecimal getValorUnidade() {
+        return valorUnidade;
+    }
+
+    public void setValorUnidade(BigDecimal valorUnidade) {
+        this.valorUnidade = valorUnidade;
     }
 }

@@ -22,7 +22,7 @@ public class Venda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(name = "data_da_venda")
     private LocalDateTime dataDaVenda;
@@ -46,12 +46,12 @@ public class Venda {
 
     public Long getId() {
 
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
 
-        this.Id= id;
+        this.id = id;
     }
 
     public LocalDateTime getDataDaVenda() {
