@@ -122,7 +122,7 @@ public class VendaController {
             Boolean possuiEstoque = estoqueRepository.quantidadeTotal(produto.get().getId()) >= itemVenda.getQuantidade();
 
 
-            if (produto.isPresent() && venda.isPresent() && possuiEstoque && !venda.get().isFinalizada()) {
+            if (produto.isPresent() && venda.isPresent() && possuiEstoque && !venda.get().isFinalizada() && produto.get().getStatus()) {
 
                 ItemVenda novoItemVenda = new ItemVenda();
                 novoItemVenda.setQuantidade(itemVenda.getQuantidade());

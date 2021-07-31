@@ -64,7 +64,7 @@ public class FabricacaoController {
         try {
             Optional<Produto> produtoProduzido = produtoRepository.findById(fabricacao.getProduto().getId());
 
-            if (produtoProduzido.isPresent()) {
+            if (produtoProduzido.isPresent() && produtoProduzido.get().getStatus()) {
                 Fabricacao novaFabricacao = new Fabricacao();
                 novaFabricacao.setDataDeProducao(LocalDateTime.now());
                 novaFabricacao.setProduto(produtoProduzido.get());
@@ -90,7 +90,7 @@ public class FabricacaoController {
             Optional<Produto> produto = produtoRepository.findById(itemFabricacao.getProduto().getId());
             Boolean possuiEstoque = estoqueRepository.quantidadeTotal(produto.get().getId()) >= itemFabricacao.getQuantidade();
 
-            if (produto.isPresent() && fabricacao.isPresent() && !fabricacao.get().isFinalizada() && possuiEstoque) {
+            if (produto.isPresent() && fabricacao.isPresent() && !fabricacao.get().isFinalizada() && possuiEstoque && produto.get().getStatus()) {
 
                 ItemFabricacao novoItemFabricacao = new ItemFabricacao();
 
@@ -133,6 +133,8 @@ public class FabricacaoController {
                 } else {
                     atualizacao.setValorDeCustoUnitario(valorTotal);
                     atualizacao.setFinalizada(true);
+                    atualizacao.getProduto().setValorDeCusto(valorTotal);
+                    atualizacao.getProduto().setValorDeVenda(valorTotal.multiply(BigDecimal.valueOf(2.5)));
 
                     Estoque novaMovimentacao = new Estoque(fabricacaoDesejada.get().getQuantidade(),
                             LocalDateTime.now(),

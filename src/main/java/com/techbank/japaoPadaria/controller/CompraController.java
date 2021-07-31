@@ -108,7 +108,7 @@ public class CompraController {
             Optional<Produto> produto = produtoRepository.findById(itemCompra.getProduto().getId());
 
 
-            if (produto.isPresent() && compra.isPresent() && !compra.get().isFinalizada()) {
+            if (produto.isPresent() && compra.isPresent() && !compra.get().isFinalizada() && produto.get().getStatus()) {
 
                 ItemCompra novoItemCompra = new ItemCompra();
 
