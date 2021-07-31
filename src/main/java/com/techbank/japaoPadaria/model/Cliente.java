@@ -15,7 +15,7 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String Nome;
@@ -26,11 +26,11 @@ public class Cliente {
     //encapsulamento do campo.
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getNome() {
@@ -52,7 +52,7 @@ public class Cliente {
     @Override
     public String toString() {
         return "Cliente{" +
-                "id=" + Id +
+                "id=" + id +
                 ", nome='" + Nome + '\'' +
                 ", cpf='" + cpf + '\'' +
                 '}';

@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "producao")
-public class Producao {
+@Table(name = "fabricacao")
+public class Fabricacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +28,9 @@ public class Producao {
     @Column(name = "finalizada")
     private boolean finalizada;
 
-    @OneToMany(mappedBy = "producao")
+    @OneToMany(mappedBy = "fabricacao")
     @JsonIgnore
-    private List<ItemProducao> itemProducao;
+    private List<ItemFabricacao> itemFabricacao;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
@@ -71,12 +70,12 @@ public class Producao {
         this.quantidade = quantidade;
     }
 
-    public List<ItemProducao> getItemProducao() {
-        return itemProducao;
+    public List<ItemFabricacao> getItemProducao() {
+        return itemFabricacao;
     }
 
-    public void setItensProducao(List<ItemProducao> itensProducao) {
-        this.itemProducao = itensProducao;
+    public void setItensProducao(List<ItemFabricacao> itensProducao) {
+        this.itemFabricacao = itensProducao;
     }
 
     public Produto getProduto() {

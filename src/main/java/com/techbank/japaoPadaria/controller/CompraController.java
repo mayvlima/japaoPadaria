@@ -118,6 +118,11 @@ public class CompraController {
                novoItemCompra.setProduto(produto.get());
                novoItemCompra.setCompra(compra.get());
 
+                produto.get().setValorDeCusto(novoItemCompra.getValorUnidade());
+                produto.get().setValorDeVenda(itemCompra.getValorUnidade().multiply(BigDecimal.valueOf(1.3)));
+
+                produtoRepository.save(produto.get());
+
                 return new ResponseEntity<>(itemCompraRepository.save(novoItemCompra), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

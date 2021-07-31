@@ -32,27 +32,27 @@ public class Produto {
     @Column(name = "codigo_de_barras", nullable = false, unique = true)
     private String codigoDeBarras;
 
-    @Column(name = "quantidade_medida")
-    private BigDecimal quantidadeDeMedida;
+    @Column(name = "quantidade_medida", nullable = false)
+    private Integer quantidadeDeMedida;
 
-    @Column(name = "unidade_de_medida")
+    @Column(name = "unidade_de_medida", nullable = false)
     private String unidadeDeMedida;
 
     @Column(nullable = false)
     private boolean status;
 
     @OneToMany(mappedBy = "produto")
-    private List<ItemProducao> itemProducao;
+    private List<ItemFabricacao> itemFabricacao;
 
     @OneToMany(mappedBy = "produto")
-    private List<Producao> producoes;
+    private List<Fabricacao> producoes;
 
 
     public Produto() {
 
     }
 
-    public Produto(String descricao, BigDecimal valorDeCusto, BigDecimal valorDeVenda, String codigoDeBarras, BigDecimal quantidadeMedida, String unidadeDeMedida, boolean status) {
+    public Produto(String descricao, BigDecimal valorDeCusto, BigDecimal valorDeVenda, String codigoDeBarras, Integer quantidadeMedida, String unidadeDeMedida, boolean status) {
         this.descricao = descricao;
         this.valorDeCusto = valorDeCusto;
         this.valorDeVenda = valorDeVenda;
@@ -102,11 +102,11 @@ public class Produto {
         this.codigoDeBarras = codigoDeBarras;
     }
 
-    public BigDecimal getQuantidadeDeMedida() {
+    public Integer getQuantidadeDeMedida() {
         return quantidadeDeMedida;
     }
 
-    public void setQuantidadeDeMedida(BigDecimal quantidadeDeMedida) {
+    public void setQuantidadeDeMedida(Integer quantidadeDeMedida) {
         this.quantidadeDeMedida = quantidadeDeMedida;
     }
 

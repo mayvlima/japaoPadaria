@@ -58,11 +58,7 @@ public class VendaController {
     public ResponseEntity<Venda> getVendaById(@PathVariable("id") long id) {
         Optional<Venda> venda = vendaRepository.findById(id);
 
-        if (venda.isPresent()) {
-            return new ResponseEntity<>(venda.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return venda.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/buscar")
@@ -144,7 +140,7 @@ public class VendaController {
 
                 return new ResponseEntity<>(itemVendaRepository.save(novoItemVenda), HttpStatus.CREATED);
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Não é permitido adicionar um produto a uma venda que não existe ou já foi finalizada");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Ação não permitida");
             }
 
         } catch (Exception e) {

@@ -6,8 +6,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "item_producao")
-public class ItemProducao {
+@Table(name = "item_fabricacao")
+public class ItemFabricacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,19 +20,18 @@ public class ItemProducao {
     private int quantidade;
 
     @Column(name = "quantidade_de_medida")
-    private int quantidadeDeMedida;
+    private Integer quantidadeDeMedida;
 
     @Column(name = "unidade_de_medida")
     private String unidadeDeMedida;
 
     @ManyToOne
-    @JoinColumn(name = "id_producao")
+    @JoinColumn(name = "id_fabricacao")
     @JsonIgnore
-    private Producao producao;
+    private Fabricacao fabricacao;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
-    @JsonIgnore
     private Produto produto;
 
 
@@ -76,12 +75,12 @@ public class ItemProducao {
         this.unidadeDeMedida = unidadeDeMedida;
     }
 
-    public Producao getProducao() {
-        return producao;
+    public Fabricacao getFabricacao() {
+        return fabricacao;
     }
 
-    public void setProducao(Producao producao) {
-        this.producao = producao;
+    public void setFabricacao(Fabricacao fabricacao) {
+        this.fabricacao = fabricacao;
     }
 
     public Produto getProduto() {
