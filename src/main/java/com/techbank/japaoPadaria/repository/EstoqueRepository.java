@@ -11,11 +11,17 @@ import java.util.List;
 
 public interface EstoqueRepository extends JpaRepository<Estoque, Long> {
 
-    List<Estoque> findAllByDataDeMovimentacaoBetween(LocalDateTime dataInicial, LocalDateTime dataFinal);
+
+    @Query(value = "select * from estoque where data_de_movimentacao between :dataInicial and :dataFinal", nativeQuery = true)
+    List<Estoque> findAllByDataDeMovimentacaoBetween(@Param("dataInicial") LocalDateTime dataInicial,@Param("dataFinal") LocalDateTime dataFinal);
+
 
     List<Estoque> findAllByProduto(Produto produto);
 
     @Query(value = "SELECT SUM(quantidade) FROM estoque where id_produto = :id_produto", nativeQuery = true)
-    public Integer quantidadeTotal(@Param("id_produto") Long id);
+    Integer quantidadeTotal(@Param("id_produto") Long id);
+
+    @Query(value = "select * from estoque where descricao ilike '%:descricao%'", nativeQuery = true)
+    List<Estoque> estoquePorDescricao(@Param("descricao") String descricao) ;
 
 }

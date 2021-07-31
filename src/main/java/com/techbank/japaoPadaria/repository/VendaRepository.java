@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface VendaRepository extends JpaRepository<Venda, Long> {
 
-    List<Venda> findAllByDataDaVendaBetween(LocalDateTime dataInicial, LocalDateTime dataFinal);
+    @Query(value = "select * from venda where data_da_venda between :dataInicial and :dataFinal", nativeQuery = true)
+    List<Venda> findAllByDataDaVendaBetween(@Param("dataInicial") LocalDateTime dataInicial,@Param("dataFinal") LocalDateTime dataFinal);
 
 }

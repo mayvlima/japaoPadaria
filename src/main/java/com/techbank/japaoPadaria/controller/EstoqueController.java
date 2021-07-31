@@ -89,7 +89,7 @@ public class EstoqueController {
         }
     }
 
-    @GetMapping("/buscar")
+    @GetMapping("/buscarpordata")
     public ResponseEntity<List<Estoque>> getAllEstoqueByData(@RequestParam String datainicial,
                                                              @RequestParam String datafinal) {
         try {
@@ -114,5 +114,29 @@ public class EstoqueController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Estoque>> getAllEstoqueByCodigo(@RequestParam String codigodebarras) {
+        try {
+
+           Optional<Produto> produto = produtoRepository.findByCodigoDeBarras(codigodebarras);
+
+           if(produto.isPresent()) {
+
+               List<Estoque> estoque = estoqueRepository.findAllByProduto(produto.get());
+
+               if (estoque.isEmpty()) {
+                   return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+               }
+
+               return new ResponseEntity<>(estoque, HttpStatus.OK);
+           }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }
